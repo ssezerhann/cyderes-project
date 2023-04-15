@@ -1,26 +1,26 @@
 module "vpc" {
-  source = "./modules/vpc"
+  source = "./modules/vpc.tf"
 }
 
 module "elasticsearch" {
-  source = "./modules/elasticsearch"
+  source = "./modules/elasticsearch.tf"
   vpc_id = module.vpc.vpc_id
   security_group_id = module.vpc.elasticsearch_security_group_id
 }
 
 module "ecr" {
-  source = "./modules/ecr"
+  source = "./modules/ecr.tf"
 }
 
 module "ecs" {
-  source = "./modules/ecs"
+  source = "./modules/ecs.tf"
   vpc_id = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnet_ids
   ecr_repository_url = module.ecr.repository_url
 }
 
 module "alb" {
-  source = "./modules/alb"
+  source = "./modules/alb.tf"
   vpc_id = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnet_ids
   ecs_security_group_id = module.vpc.ecs_security_group_id
@@ -29,20 +29,20 @@ module "alb" {
 }
 
 module "logs" {
-  source = "./modules/logs"
+  source = "./modules/logs.tf"
   elasticsearch_domain_arn = module.elasticsearch.domain_arn
   elasticsearch_domain_endpoint = module.elasticsearch.domain_endpoint
   log_group_name = module.ecs.log_group_name
 }
 
 module "security" {
-  source = "./modules/security"
+  source = "./modules/security.tf"
   alb_security_group_id = module.vpc.alb_security_group_id
   alb_arn = module.alb.alb_arn
   alb_listener_arn = module.alb.alb_listener_arn
 }
 
 module "ebs" {
-  source = "./modules/ebs"
+  source = "./modules/ebs.tf"
   ecs_instance_role = module.ecs.instance_role
 }
