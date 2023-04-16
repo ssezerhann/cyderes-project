@@ -1,48 +1,44 @@
 module "vpc" {
-  source = "./modules/vpc.tf"
+  source = "./modules/vpc"
+
+  vpc_cidr_block = var.vpc_cidr_block
+  public_subnet_cidr_blocks = var.public_subnet_cidr_blocks
+  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
+}
+
+module "security_group" {
+  source = "./modules/security_group"
+
+  vpc_id = module.vpc.vpc_id
+}
+
+module "web_server" {
+  source = "./modules/web_server"
+
+  subnet_ids = module.vpc.public_subnet_ids
+  security_group_id = module.security_group.this_security_group_id
+}
+
+module "load_balancer" {
+  source = "./modules/load_balancer"
+
+  subnet_ids = module.vpc.public_subnet_ids
+  security_group_id = module.security_group.this_security_group_id
+  target_group_arn = module.web_server.target_group_arn
 }
 
 module "elasticsearch" {
-  source = "./modules/elasticsearch.tf"
-  vpc_id = module.vpc.vpc_id
-  security_group_id = module.vpc.elasticsearch_security_group_id
-}
+  source = "./modules/elasticsearch"
 
-module "ecr" {
-  source = "./modules/ecr.tf"
-}
-
-module "ecs" {
-  source = "./modules/ecs.tf"
-  vpc_id = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnet_ids
-  ecr_repository_url = module.ecr.repository_url
+  elasticsearch_instance_type = var.elasticsearch_instance_type
 }
 
-module "alb" {
-  source = "./modules/alb.tf"
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnet_ids
-  ecs_security_group_id = module.vpc.ecs_security_group_id
-  ecs_service_name = module.ecs.service_name
-  ecs_task_family = module.ecs.task_family
+module "s3_bucket" {
+  source = "./modules/s3_bucket"
 }
 
 module "logs" {
-  source = "./modules/logs.tf"
-  elasticsearch_domain_arn = module.elasticsearch.domain_arn
-  elasticsearch_domain_endpoint = module.elasticsearch.domain_endpoint
-  log_group_name = module.ecs.log_group_name
+  source = "./modules/logs"
 }
 
-module "security" {
-  source = "./modules/security.tf"
-  alb_security_group_id = module.vpc.alb_security_group_id
-  alb_arn = module.alb.alb_arn
-  alb_listener_arn = module.alb.alb_listener_arn
-}
-
-module "ebs" {
-  source = "./modules/ebs.tf"
-  ecs_instance_role = module.ecs.instance_role
-}
