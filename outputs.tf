@@ -1,11 +1,14 @@
-output "vpc_id" {
-  value = module.vpc.vpc_id
+output "elasticsearch_endpoint" {
+  description = "The endpoint of the Elasticsearch domain"
+  value       = module.elasticsearch.domain_endpoint
 }
 
-output "public_subnets" {
-  value = module.vpc.public_subnets
+output "elasticsearch_kibana_endpoint" {
+  description = "The Kibana endpoint of the Elasticsearch domain"
+  value       = module.elasticsearch.kibana_endpoint
 }
 
-output "private_subnets" {
-  value = module.vpc.private_subnets
+output "eks_cluster_name" {
+  description = "The name of the EKS cluster"
+  value       = module.eks.cluster_id
 }
