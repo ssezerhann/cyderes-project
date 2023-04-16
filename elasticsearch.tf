@@ -34,7 +34,15 @@ resource "aws_elasticsearch_domain" "cyderes_elasticsearch" {
   tags = merge(var.tags, {
     Name = "cyderes-elasticsearch"
   })
+  domain_endpoint_options {
+    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+  }
+  encrypt_at_rest {
+    enabled = true
+  }
 }
+
+
 
 output "elasticsearch_endpoint" {
   value = aws_elasticsearch_domain.cyderes_elasticsearch.endpoint

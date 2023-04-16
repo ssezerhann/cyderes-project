@@ -8,12 +8,18 @@ resource "aws_lb" "cyderes_alb" {
   tags = merge(var.tags, {
     Name = "cyderes-alb"
   })
+  drop_invalid_header_fields = true
+  access_logs {
+    enabled = true
+  }
+  enable_deletion_protection = true
 }
 
 resource "aws_lb_listener" "cyderes_alb_listener" {
   load_balancer_arn = aws_lb.cyderes_alb.arn
   port              = var.alb_port
-  protocol          = "HTTP"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type             = "forward"
@@ -48,3 +54,4 @@ output "alb_dns_name" {
 output "target_group_arn" {
   value = aws_lb_target_group.cyderes_alb_target_group.arn
 }
+

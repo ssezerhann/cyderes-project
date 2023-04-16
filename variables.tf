@@ -2,6 +2,18 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+variable "alb_port" {
+  description = "The port the ALB listens on."
+  type        = number
+  default     = 443
+}
+
+variable "container_port" {
+  description = "The port the container listens on."
+  type        = number
+  default     = 80
+}
+
 variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }

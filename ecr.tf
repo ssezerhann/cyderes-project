@@ -1,13 +1,17 @@
 resource "aws_ecr_repository" "cyderes_ecr" {
   name                 = "cyderes-webserver"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
   image_scanning_configuration {
     scan_on_push = true
   }
   tags = merge(var.tags, {
     Name = "cyderes-ecr"
   })
+  encryption_configuration {
+    encryption_type = "KMS"
+  }
 }
+
 
 data "aws_ecr_image" "cyderes_ecr_image" {
   repository_name = aws_ecr_repository.cyderes_ecr.name
