@@ -1,7 +1,8 @@
 output "elasticsearch_endpoint" {
-  description = "The endpoint of the Elasticsearch domain"
-  value       = module.elasticsearch.domain_endpoint
+  description = "Elasticsearch domain endpoint"
+  value       = module.elasticsearch.endpoint
 }
+
 
 output "elasticsearch_kibana_endpoint" {
   description = "The Kibana endpoint of the Elasticsearch domain"

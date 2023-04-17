@@ -16,14 +16,21 @@ module "vpc" {
 }
 
 module "elasticsearch" {
-  source = "lgallard/elasticsearch/aws"
-  version = "0.3.1"
+  source  = "lgallard/elasticsearch/aws"
+  version = "0.14.1"
 
   domain_name           = "my-elasticsearch"
   elasticsearch_version = "7.10"
-  vpc_id                = module.vpc.vpc_id
-  subnet_ids            = module.vpc.private_subnet_ids
+
+  vpc_options = {
+    vpc_id     = module.vpc.vpc_id
+    subnet_ids = module.vpc.private_subnets
+  }
 }
+
+
+
+
 
 resource "aws_security_group" "allow_http" {
   name        = "allow_http"
@@ -42,18 +49,13 @@ resource "aws_security_group_rule" "allow_http" {
 }
 
 module "eks" {
+  version = "17.23.0"
   source = "terraform-aws-modules/eks/aws"
 
   cluster_name = "my-eks"
-  subnets      = module.vpc.private_subnet_ids
+  subnets      = module.vpc.private_subnets
   tags = {
     Terraform = "true"
     Kubernetes = "EKS"
   }
-
-  vpc_id = module.vpc.vpc_id
-}
-
-locals {
-  kubeconfig = yamldecode(aws_eks_cluster.this.kubeconfig)
 }
